@@ -2,24 +2,38 @@
 
 const productService = require("../services/productService");
 
-const getAllProducts = (req, res) => {
-  const products = productService.getAllProducts();
-  res.json(products);
-};
-
-const getProductById = (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const product = productService.getProductById(id);
-  if (product) {
-    res.json(product);
-  } else {
-    res.status(404).json({ message: "Product not found" });
+const getAllProducts = (req, res, next) => {
+  try {
+    const products = productService.getAllProducts();
+    res.json(products);
+  } catch (err) {
+    next(err);
   }
 };
 
-const addProduct = (req, res) => {
-  const newProduct = productService.addProduct(req.body);
-  res.status(201).json(newProduct);
+const getProductById = (req, res, next) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const product = productService.getProductById(id);
+    if (product) {
+      res.json(product);
+    } else {
+      const error = new Error("Product not found");
+      error.statusCode = 404;
+      next(error);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const addProduct = (req, res, next) => {
+  try {
+    const newProduct = productService.addProduct(req.body);
+    res.status(201).json(newProduct);
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
